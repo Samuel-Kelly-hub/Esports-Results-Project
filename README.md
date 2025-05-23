@@ -19,16 +19,16 @@ The 3rd notebook, LoL_Predictions utilises 3 different machine learning models t
 - Data Visualisation
 - Statistical Analysis
 - Feature Engineering
-- Dealing with missing values
+- Dealing with Missing Values
 - Exploratory Data Analysis
 
 **LoL_Elo_System.ipynb**
 - Data Engineering and Reshaping
 - Label Encoding
-- NumPy skills
-- Written explanation of how Elo Systems work
-- Creating custom functions
-- Data analysis and visualisation
+- NumPy Skills
+- Written Explanation of how Elo Systems Work
+- Creating Custom Functions
+- Data Analysis and Visualisation
 - Model Evaluation
 
 **LoL_Predictions.ipynb**
@@ -39,8 +39,8 @@ The 3rd notebook, LoL_Predictions utilises 3 different machine learning models t
 - Data Filtering
 - Data Transformation
 - Dimensionality Reduction
-- An understandinf of how various Machine Learning algorithms work
-- Machine Learning optimisation
+- An Understanding of how various Machine Learning Algorithms Work
+- Machine Learning Optimisation
 - Feature Importance Analysis
 
 ## Libraries Used:
