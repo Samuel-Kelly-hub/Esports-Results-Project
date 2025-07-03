@@ -1,63 +1,63 @@
 # Esports-Results-Project
+
+This is a python-based project to predict the results of professional LoL (League of Legends) games.  It uses historical data from: www.oracleselixir.com/tools/downloads.
+LoL is a game where 2 teams of 5 players select a "Champion" and fight each other using those Champions.
 ***
-This is a python-based project to predict the results of professional League of Legends (LoL) games and exemplify my Data Science, and Python skills.  LoL is a game where 2 teams of 5 players select a "champion" and fight each other for about 30-40 minutes to destroy the other team.
-## Overview and Structure:
 
-This project is contained within 3 Jupyter Notebooks, each one exemplifying a different subset of skills.  The notebooks are:
-- LoL_Data_Exploration.ipynb
-- LoL_Elo_System.ipynb
-- LoL_Predictions.ipynb
+## Project Structure:
+LoL_Data_Exploration.ipynb - Visualises the data, and uses statistical methods to explore relationships and variations in the data.
 
-The 1st notebook, LoL_Data_Exploration, combines 11 years of LoL esports game data into a single dataframe.  The data was gathered from Oracle Elixir (https://oracleselixir.com/tools/downloads).  I engaged in exploratory data analysis in order to identify and understand the variations in the data as well as extract meaningful insights that can assist the coaching and decision making of professional esports teams.  I also engaged in cursory logistic regression to illuminate some of the key predictive features.  The notebook, in giving me a better understanding of the data, allowed me to develop a better predictive model.
+LoL_Elo_System.ipynb - Creates, optimises, and analyses an Elo system to predict the results of games based off of the players.
 
-The 2nd notebook, LoL_Elo_System.ipynb is focused on creating an elo system to predict the result of games.  As part of my preprocessing, I reshaped the dataset, and label encoded the categorical data (such as player names).  The elo system used 11 different component ratings for each team to create a holistic rating.  Using NumPy to improve the efficiency of my system, I utilised matrix multiplication and used NumPy arrays as a maps.  The system was then optimised using scipy.minimize.  The notebook, by creating new features, improved the predictive performance of my machine learning models, in LoL_Predictions, and by through analysis of the elo system's results, I gained a better understanding of the predictive importance of different categorical features.
+LoL_Predictions.ipynb - Predicts the results of LoL games using both the Elo system and the Champions selected in a meta model.
 
-The 3rd notebook, LoL_Predictions utilises 3 different machine learning models to predict the results of games: Logistic Regression, Random Forest, and Gradient Boost; the notebook includes a description of how all 3 models work.  In preprocessing, I reshaped the data, created derivative features, and standardised the data for each position, before evaluating the effectiveness of PCA, manual dimensionality reduction, and data transformation.  Finally, I assessed the effectiveness of the models using F1 Score and accuracy.
+# Findings and Results
+![EDA of Positions](images/LoL_Pic8.png) <br>
+In my EDA, I found that not only were there significant differences in metrics across the different positions, but that champions played across multiple positions maintain these positional differences.  I also found that the team on the Blue side wins games 53.5% of the time, and that the teams in a game explain more variation in the result than the Champions.
 
-## Skills Demonstrated in Each Notebook:
-**LoL_Data_Exploration.ipynb**
-- Data Visualisation
-- Statistical Analysis
-- Feature Engineering
-- Dealing with Missing Values
-- Exploratory Data Analysis
+These findings informed my Elo rating where I optimized a custom variable to account for the Blue side team's inherent advantage, and my Gradient Boosting model, where I categorised Champions by position.
 
-**LoL_Elo_System.ipynb**
-- Data Engineering and Reshaping
-- Label Encoding
-- NumPy Skills
-- Written Explanation of how Elo Systems Work
-- Creating Custom Functions
-- Data Analysis and Visualisation
-- Model Error Analysis
+In order to predict the results of games, I created:
+- An Elo system that learns the strength of players and teams from their previous results.
+- A Gradient Boosting model to learn champion strengths and interactions.
+- A Logistic Regression meta model to prevent underfitting champion data.
 
-**LoL_Predictions.ipynb**
-- Data Cleaning
-- Feature Engineering
-- Pre-processing for Machine Learning
-- Z-score normalised data
-- Data Filtering
-- Data Transformation
-- Dimensionality Reduction
-- An Understanding of how various Machine Learning Algorithms Work
-- Machine Learning Optimisation
-- Feature Importance Analysis
+![Component Importance for Elo System](images/LoL_Pic9.png) <br>
 
-## Libraries Used:
-**Primary Libraries:**
-- Pandas
-- NumPy
-- Scikit-learn
-- Matplotlib
-- XGBoost
+The Elo system utilised composite ratings: rather than assigning a single rating per team, it calculated six ratings, one for each player and one for the organisation before adding them together.  To take into account the positional differences, I applied and optimised each component's weight in the composite rating as well as the rate of change for each component.
 
-**Secondary Libraries**
-- SciPy
-- Seaborn
-- Functools
+Because my Elo system was non-differentiable, I utilised NumPy arrays as both maps and vectors (for dot products) to significantly reduce the time to optimise using scipy.optimize.
 
-## How to Run the Application:
-- Clone this repository.
-- Make sure you have the correct packages installed.
-- Unzip any zipped files.
-- Open each Jupyter Notebook and run the cells in order.
+The Elo system had a test accuracy of 65.36%.
+
+![Calibration of Elo System](images/LoL_Pic6.png) <br>
+
+I analysed calibration of each quintile of game data, to evaluate how much the Elo system improved with training.  The system's calibration of the top 10% of games, by predicted probability, reduced from an ECE of 0.052, in the first quintile, to 0.017 in the fifth.  I found, using bootstrapping with a 0.95 confidence interval, that this decrease in ECE (overconfidence) was statistically significant with a lower bound of 0.0078.
+
+I then engaged in two-stage modelling to prevent underfitting due to the suspected dominance of Elo Ratings over Champion data from my EDA.  I predicted the result of games by using the Champions selected in each position, using XGBoost to learn the impact of both champions, and champion interactions on the result.
+
+However, due to the small population size of professional games, the gradient boosting model was not able to learn from many interactions without also learning noise, which necessitated strong regularisation.  It was able to learn certain common interactions such as Xayah and Rakan.
+
+![Xayah and Rakan Interaction](images/LoL_Pic2.png) <br>
+We can see the positive impact on the result that the Xayah and Rakan interaction produces.
+
+![Overall Model Calibration](images/LoL_Pic10.png) <br>
+
+I then used the Elo Differential, and probabilities from XGBoost, in a Logistic Regression meta model to predict the result of games.  The model had a Brier score of 0.215, and an ECE of 0.009 meaning that it was very well calibrated but had a low resolution (was poor at separating wins from losses) as we can see from the distribution of predicted probabilities.  It was also calibrated worse for predicted probabilities below 0.20.
+
+It's Test Accuracy (65.68%) was also only marginally better than the Elo model, and so, the inclusion of Champion features did not notably improve the predictive capabilities of the model.  Future work could be done to find a solution to the small population size of professional games to improve the ability of the model to learn Champion interactions.
+
+## Installation
+```
+git clone www.github.com/Samuel-Kelly-hub/Esports-Results-Project
+cd Esports-Results-Project
+pip install -r requirements.txt
+```
+## How to Run Notebooks
+```
+jupyter notebook
+```
+Run the notebooks in the following order:
+1. `LoL_Data_Exploration.ipynb`
+2. `LoL_Elo_System.ipynb`
+3. `LoL_Predictions.ipynb`
