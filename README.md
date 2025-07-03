@@ -29,7 +29,7 @@ The 3rd notebook, LoL_Predictions utilises 3 different machine learning models t
 - Written Explanation of how Elo Systems Work
 - Creating Custom Functions
 - Data Analysis and Visualisation
-- Model Evaluation
+- Model Error Analysis
 
 **LoL_Predictions.ipynb**
 - Data Cleaning
